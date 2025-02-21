@@ -5,7 +5,20 @@
  *
  * Made By MaterializeCSS.com
  */
+/* Removes padding */
+.padding-0px {
+    padding: 0px !important;
+}
+/* Make logo fit in the header */
+.nav-wrapper .brand-logo img {
+    height: 64px;
+}
 
+@media (max-width: 600px) {
+    .nav-wrapper .brand-logo img {
+        height: 56px;
+    }
+}
 nav ul a,
 nav .brand-logo {
   color: #444;
