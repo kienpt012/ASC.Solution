@@ -29,14 +29,15 @@
     <li>
         <ul class="collapsible collapsible-accordion">
             <li>
-                <a class="collapsible-header">User Administration<i class="material-icons">arrow_drop_down</i></a>
-                <div class="collapsible-body">
-                    <ul>
-                        <li><a href="#!">Manage Customers</a></li>
-                        <li><a href="#!">Provision Users</a></li>
-                        <li><a href="#!">Deactivate Users</a></li>
-                    </ul>
-                </div>
+                <!-- Dropdown Trigger -->
+                <a class="dropdown-trigger" href="#" data-target="dropdown1">User Administration<i class="material-icons right">arrow_drop_down</i></a>
+
+                <!-- Dropdown Structure -->
+                <ul id="dropdown1" class="dropdown-content">
+                    <li><a href="#!">Manage Customers</a></li>
+                    <li><a href="#!">Provision Users</a></li>
+                    <li><a href="#!">Deactivate Users</a></li>
+                </ul>
             </li>
         </ul>
     </li>
