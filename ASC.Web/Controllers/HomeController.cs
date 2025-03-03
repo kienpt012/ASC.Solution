@@ -2,9 +2,8 @@ using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
 using ASC.Web.Models;
-using ASC.Solution.Configuration;
+using ASC.Web.Configuration;
 using ASC.Web.Services;
-using ASC.Solution.Configuration;
 namespace ASC.Web.Controllers;
 
 public class HomeController : Controller

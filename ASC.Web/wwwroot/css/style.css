@@ -70,9 +70,9 @@ footer.page-footer {
 }
 
 /* Adjusting padding to display Side Nav */
-header.secureLayout, main.secureLayout, footer.secureLayout {
+/*header.secureLayout, main.secureLayout, footer.secureLayout {
     padding-left: 300px;
-}
+}*/
 
 @media only screen and (max-width: 992px) {
     header.secureLayout, main.secureLayout, footer.secureLayout {
