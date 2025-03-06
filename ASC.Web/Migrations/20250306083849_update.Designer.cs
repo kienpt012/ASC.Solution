@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASC.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250228035446_cons")]
-    partial class cons
+    [Migration("20250306083849_update")]
+    partial class update
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,6 +97,40 @@ namespace ASC.Web.Migrations
                     b.HasKey("PartitionKey", "RowKey");
 
                     b.ToTable("MasterDataValues");
+                });
+
+            modelBuilder.Entity("ASC.Model.Models.Product", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ProductId");
+
+                    b.ToTable("Products");
+
+                    b.HasData(
+                        new
+                        {
+                            ProductId = 1,
+                            Name = "Oil Change"
+                        },
+                        new
+                        {
+                            ProductId = 2,
+                            Name = "Tire Rotation"
+                        },
+                        new
+                        {
+                            ProductId = 3,
+                            Name = "Brake Inspection"
+                        });
                 });
 
             modelBuilder.Entity("ASC.Model.Models.ServiceRequest", b =>

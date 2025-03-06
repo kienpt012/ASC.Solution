@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ASC.Web.Models;
 using ASC.Web.Configuration;
 using ASC.Web.Services;
+using ASC.Utilities;
 namespace ASC.Web.Controllers;
 
 public class HomeController : Controller
@@ -23,14 +24,24 @@ public class HomeController : Controller
     //    return View();
     //}
 
-    public IActionResult Index([FromServices] IEmailSender emailSender)
+    public IActionResult Index()
     {
-        var emailService = this.HttpContext.RequestServices
-    .GetService(typeof(IEmailSender)) as IEmailSender;
+        //// Set Session
+        HttpContext.Session.SetSession("Test", _settings.Value);
 
+        //// Get Session
+        var settings = HttpContext.Session.GetSession<ApplicationSettings>("Test");
+
+        //// Usage of IOptions
         ViewBag.Title = _settings.Value.ApplicationTitle;
+
+        //// Test fail test case
+        // ViewData.Model = "Test";
+        // throw new Exception("Login Fail!!!");
+
         return View();
     }
+
 
 
     public IActionResult Privacy()

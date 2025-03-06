@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace ASC.Web.Migrations
 {
     /// <inheritdoc />
-    public partial class cons : Migration
+    public partial class update : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -86,6 +88,19 @@ namespace ASC.Web.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MasterDataValues", x => new { x.PartitionKey, x.RowKey });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Products",
+                columns: table => new
+                {
+                    ProductId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Products", x => x.ProductId);
                 });
 
             migrationBuilder.CreateTable(
@@ -218,6 +233,16 @@ namespace ASC.Web.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Products",
+                columns: new[] { "ProductId", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Oil Change" },
+                    { 2, "Tire Rotation" },
+                    { 3, "Brake Inspection" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -281,6 +306,9 @@ namespace ASC.Web.Migrations
 
             migrationBuilder.DropTable(
                 name: "MasterDataValues");
+
+            migrationBuilder.DropTable(
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "ServiceRequests");
