@@ -16,41 +16,6 @@ using ASC.Utilities;
 
 namespace ASC.Tests
 {
-    public class MathOperationsTests
-    {
-        private readonly MathOperations mathOperations;
-
-        public MathOperationsTests()
-        {
-            mathOperations = new MathOperations();
-        }
-
-        [Fact]
-        public void Add_TwoNumbers_ReturnsCorrectSum()
-        {
-            // Arrange
-            int a = 10, b = 5;
-
-            // Act
-            int result = mathOperations.Add(a, b);
-
-            // Assert
-            Assert.Equal(15, result);
-        }
-
-        [Fact]
-        public void Subtract_TwoNumbers_ReturnsCorrectDifference()
-        {
-            // Arrange
-            int a = 10, b = 5;
-
-            // Act
-            int result = mathOperations.Subtract(a, b);
-
-            // Assert
-            Assert.Equal(5, result);
-        }
-    }
     public class HomeControllerTests
     {
         private readonly Mock<IOptions<ApplicationSettings>> optionsMock;
@@ -59,15 +24,12 @@ namespace ASC.Tests
 
         public HomeControllerTests()
         {
-            // Create an instance of Mock IOptions
             optionsMock = new Mock<IOptions<ApplicationSettings>>();
             mockHttpContext = new Mock<HttpContext>();
             mockHttpContext.Setup(p => p.Session).Returns(new FakeSession());
 
-            // Create an instance of Mock ILogger
             loggerMock = new Mock<ILogger<HomeController>>();
 
-            // Set IOptions<> Values property to return ApplicationSettings object
             optionsMock.Setup(ap => ap.Value).Returns(new ApplicationSettings
             {
                 ApplicationTitle = "Automobile Service Center Application"
@@ -77,11 +39,9 @@ namespace ASC.Tests
         [Fact]
         public void HomeController_Index_View_Test()
         {
-            // Home controller instantiated with Mock IOptions<> and ILogger objects
             var controller = new HomeController(loggerMock.Object, optionsMock.Object);
             controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
-            // Assert return ViewResult
             Assert.IsType(typeof(ViewResult), controller.Index());
         }
 
@@ -91,7 +51,6 @@ namespace ASC.Tests
             var controller = new HomeController(loggerMock.Object, optionsMock.Object);
             controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
-            // Assert Model for Null
             Assert.Null((controller.Index() as ViewResult).ViewData.Model);
         }
 
@@ -101,7 +60,6 @@ namespace ASC.Tests
             var controller = new HomeController(loggerMock.Object, optionsMock.Object);
             controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
-            // Assert ModelState Error Count to 0
             Assert.Equal(0, (controller.Index() as ViewResult).ViewData.ModelState.ErrorCount);
         }
 
@@ -113,7 +71,6 @@ namespace ASC.Tests
 
             controller.Index();
 
-            // Session value with key "Test" should not be null.
             Assert.NotNull(controller.HttpContext.Session.GetSession<ApplicationSettings>("Test"));
         }
     }

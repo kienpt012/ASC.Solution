@@ -18,18 +18,37 @@ namespace ASC.Tests.TestUtilities
 
         public Task CommitAsync(CancellationToken cancellationToken = default)
         {
-            return Task.CompletedTask; // Giả lập commit session
+            return Task.CompletedTask; 
         }
 
         public Task LoadAsync(CancellationToken cancellationToken = default)
         {
-            return Task.CompletedTask; // Giả lập load session
+            return Task.CompletedTask; 
         }
 
         public void Remove(string key) => _sessionStorage.Remove(key);
 
-        public void Set(string key, byte[] value) => _sessionStorage[key] = value;
+        public void Set(string key, byte[] value)
+        {
+            if (!_sessionStorage.ContainsKey(key))
+                _sessionStorage.Add(key, value);
+            else
+                _sessionStorage[key] = value;
+        }
 
-        public bool TryGetValue(string key, out byte[] value) => _sessionStorage.TryGetValue(key, out value);
+        public bool TryGetValue(string key, out byte[] value)
+        {
+            if (_sessionStorage.ContainsKey(key) && _sessionStorage[key] != null)
+            {
+                value = _sessionStorage[key];
+                return true;
+            }
+            else
+            {
+                value = null;
+                return false;
+            }
+        }
+
     }
 }
