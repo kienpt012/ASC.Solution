@@ -7,7 +7,7 @@ using ASC.Web.Services;
 using ASC.Utilities;
 namespace ASC.Web.Controllers;
 
-public class HomeController : Controller
+public class HomeController : AnonymousController
 {
     private readonly ILogger<HomeController> _logger;
     private IOptions<ApplicationSettings> _settings;
@@ -35,10 +35,7 @@ public class HomeController : Controller
     {
         return View();
     }
-    public IActionResult Dashboard()
-    {
-        return View();
-    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

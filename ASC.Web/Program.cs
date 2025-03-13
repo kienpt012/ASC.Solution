@@ -1,11 +1,12 @@
 ﻿using ASC.DataAccess;
 using ASC.DataAccess.Interfaces;
-using ASC.Solution.Services;
+using ASC.Web.Services;
 using ASC.Web.Configuration;
 using ASC.Web.Data;
 using ASC.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,10 +16,12 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>((options) =>
-{
-    options.User.RequireUniqueEmail = true;
-}).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+//builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
+
+//builder.Services.AddIdentity<IdentityUser, IdentityRole>((options) =>
+//{
+//    options.User.RequireUniqueEmail = true;
+//}).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
 builder.Services.AddScoped<DbContext, ApplicationDbContext>();
 
@@ -41,7 +44,9 @@ builder.Services.AddTransient<ISmsSender, AuthMessageSender>();
 
 builder.Services.AddSingleton<IIdentitySeed, IdentitySeed>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+builder.Services
+    .AddConfig(builder.Configuration)
+    .AddMyDependencyGroup();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -65,6 +70,11 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllerRoute(
+    name: "areaRoute",
+    pattern: "{area:exists}/{controller=Dashboard}/{action=Dashboard}",
+    defaults: new { controller = "Dashboard", action = "Dashboard" }
+);
 app.MapRazorPages();
 
 using (var scope = app.Services.CreateScope())
@@ -76,5 +86,9 @@ using (var scope = app.Services.CreateScope())
         scope.ServiceProvider.GetService<IOptions<ApplicationSettings>>()
     );
 }
-
+using (var scope = app.Services.CreateScope())
+{
+    var navigationcacheoperations = scope.ServiceProvider.GetRequiredService<INavigationCacheOperations>();
+    await navigationcacheoperations.CreateNavigationCacheAsync();
+}
 app.Run();

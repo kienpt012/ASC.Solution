@@ -1,45 +1,61 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http
+@using ASC.Utilities
+@using ASC.Web.Data
+@inject IHttpContextAccessor UserHttpContext
+@inject INavigationCacheOperations navigationCache
+@{
     Layout = "_MasterLayout";
+    var currentUser = UserHttpContext.HttpContext.User.GetCurrentUserDetails();
 }
 <!-- Header -->
 <header class="secureLayout">
     <nav class="top-nav blue-grey lighten-1">
         <div class="nav-wrapper row valign-wrapper">
             <div class="col s12 valign-wrapper">
-                <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                 <h5><a class="page-title">Automobile Service Center</a></h5>
             </div>
         </div>
     </nav>
 </header>
 
+<!-- Hidden Forms for Authentication -->
+<form class="hide" method="post" id="logout_form" asp-area="Identity" asp-page="/Account/Logout">
+    <input type="submit" value="Logout" />
+</form>
+<form class="hide" method="post" id="resetPassword_form" asp-area="Identity" asp-page="/Account/InitiateResetPassword">
+</form>
+
 <!-- Side NavBar -->
 <ul id="slide-out" class="sidenav">
     <li>
         <div class="user-view">
             <div class="background">
-                <img src="~/images/avartar.jpg">
+                <img src="~/images/bg1.jpg">
             </div>
             <a href="#user"><img class="circle" src="~/images/avartar.jpg"></a>
-            <a href="#name"><span class="white-text name">John Doe</span></a>
-            <a href="#email"><span class="white-text email">jdandturk@gmail.com</span></a>
+            <a href="#name"><span class="white-text name">@currentUser.Name</span></a>
+            <a href="#email"><span class="white-text email">@currentUser.Email</span></a>
         </div>
     </li>
     <li><a href="#!"><i class="material-icons">dashboard</i>Dashboard</a></li>
     <li>
-        <ul class="collapsible collapsible-accordion">
-            <li>
-                <!-- Dropdown Trigger -->
-                <a class="dropdown-trigger" href="#" data-target="dropdown1">User Administration<i class="material-icons right">arrow_drop_down</i></a>
+        @if (currentUser.Roles.Contains("Admin"))
+        {
+            <ul class="collapsible collapsible-accordion">
+                <li>
+                    <!-- Dropdown Trigger -->
+                    <a class="dropdown-trigger" href="#" data-target="dropdown1">User Administration<i class="material-icons right">arrow_drop_down</i></a>
 
-                <!-- Dropdown Structure -->
-                <ul id="dropdown1" class="dropdown-content">
-                    <li><a href="#!">Manage Customers</a></li>
-                    <li><a href="#!">Provision Users</a></li>
-                    <li><a href="#!">Deactivate Users</a></li>
-                </ul>
-            </li>
-        </ul>
+                    <!-- Dropdown Structure -->
+                    <ul id="dropdown1" class="dropdown-content">
+                        <li><a href="#!">Manage Customers</a></li>
+                        <li><a href="#!">Provision Users</a></li>
+                        <li><a href="#!">Deactivate Users</a></li>
+                    </ul>
+                </li>
+            </ul>
+        }
     </li>
     <li>
         <a class="collapsible-header" href="#!">
@@ -57,14 +73,19 @@
         </a>
     </li>
     <li>
-        <a class="collapsible-header" href="#!">
-            <i class="material-icons">settings</i>Settings
-        </a>
-    </li>
-    <li>
-        <a class="collapsible-header" href="#!">
-            <i class="material-icons">exit_to_app</i>Logout
-        </a>
+        <ul class="collapsible collapsible-accordion">
+            <li>
+                <a class="collapsible-header" href="#!">
+                    <i class="material-icons">settings</i>Settings<i class="material-icons right">arrow_drop_down</i>
+                </a>
+                <div class="collapsible-body">
+                    <ul>
+                        <li><a href="#!" id="ancrResetPassword" class="waves-effect"><i class="material-icons">lock</i>Reset Password</a></li>
+                        <li><a href="#!" id="ancrLogout" class="waves-effect"><i class="material-icons">exit_to_app</i>Logout</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
     </li>
 </ul>
 <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
@@ -113,3 +134,37 @@
         </div>
     </div>
 </footer>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Initialize sidenav
+            $('.sidenav').sidenav({
+                edge: 'left', // Đảm bảo sidenav mở từ trái
+                draggable: true // Cho phép kéo trên thiết bị cảm ứng
+            });
+
+            // Initialize collapsible elements
+            $('.collapsible').collapsible();
+
+            // Handle logout button
+            $('#ancrLogout').click(function (e) {
+                e.preventDefault();
+                $('#logout_form').submit();
+            });
+
+            // Handle reset password
+            $('#ancrResetPassword').click(function (e) {
+                e.preventDefault();
+                $('#resetPassword_form').submit();
+            });
+
+            // Initialize dropdown
+            $('.dropdown-trigger').dropdown({
+                coverTrigger: false,
+                constrainWidth: false
+            });
+        });
+    </script>
+}
