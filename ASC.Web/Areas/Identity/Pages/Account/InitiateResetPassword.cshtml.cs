@@ -43,8 +43,8 @@ namespace ASC.Web.Areas.Identity.Pages.Account
             // Send Email
             await _emailSender.SendEmailAsync(userEmail, "Reset Password",
                 $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-
-            return RedirectToPage("./ResetPasswordEmailConfirmation");
+            TempData["Message"] = "Please check your email to reset your password.";
+            return Page();
         }
     }
 }

@@ -20,6 +20,7 @@ namespace ASC.Web.Areas.Identity.Pages.Account
         /// </summary>
         public void OnGet()
         {
+            TempData["Message"] = "Reset Password successful!";
         }
     }
 }
