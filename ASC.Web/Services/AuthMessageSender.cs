@@ -7,9 +7,10 @@ using Microsoft.Extensions.Options;
 using System.Net.Mail;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
+
 namespace ASC.Web.Services
 {
-    public class AuthMessageSender : IEmailSender, ISmsSender // Hoàn thành khai báo ISmsSender
+    public class AuthMessageSender : IEmailSender, ISmsSender
     {
         private readonly IOptions<ApplicationSettings> _settings;
 
@@ -27,9 +28,11 @@ namespace ASC.Web.Services
             emailMessage.From.Add(new MailboxAddress("admin", _settings.Value.SMTPAccount));
             emailMessage.To.Add(new MailboxAddress("user", email));
             emailMessage.Subject = subject;
-            emailMessage.Body = new TextPart("plain") { Text = message };
 
-            using (var client = new MailKit.Net.Smtp.SmtpClient()) // Chỉ định rõ MailKit.SmtpClient
+            // Thay đổi từ plain text sang HTML
+            emailMessage.Body = new TextPart("html") { Text = message };
+
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
             {
                 await client.ConnectAsync(_settings.Value.SMTPServer, _settings.Value.SMTPPort, SecureSocketOptions.Auto);
                 await client.AuthenticateAsync(_settings.Value.SMTPAccount, _settings.Value.SMTPPassword);
