@@ -59,7 +59,7 @@ namespace ASC.Web.Areas.Identity.Pages.Account
                 if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
-                    return RedirectToPage("./ForgotPasswordConfirmation");
+                    ModelState.AddModelError(string.Empty, "Email không tồn tại trong hệ thống");
                 }
 
                 // For more information on how to enable account confirmation and password reset please
@@ -69,7 +69,7 @@ namespace ASC.Web.Areas.Identity.Pages.Account
                 var callbackUrl = Url.Page(
                     "/Account/ResetPassword",
                     pageHandler: null,
-                    values: new { area = "Identity", code },
+                    values: new { area = "Identity", code, userID = user.Id },
                     protocol: Request.Scheme);
 
                 var emailBody = $@"
