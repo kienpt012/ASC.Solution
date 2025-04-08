@@ -8,6 +8,7 @@
 <div class="container">
     <div class="row">
         <div class="col s12 m5 offset-m2">
+            <!-- Form đăng nhập thông thường -->
             <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <div class="input-field col s12">
@@ -44,6 +45,20 @@
                     <a href="/Identity/Account/ForgotPassword">Forgot your password?</a>
                 </div>
             </form>
+
+            <!-- Thêm phần đăng nhập bằng Google -->
+            <div class="row center">
+                <h5>Or log in with:</h5>
+                <form asp-area="Identity" asp-page="/Account/ExternalLogin" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                    <button type="submit" name="provider" value="Google" class="btn waves-effect waves-light red lighten-1">
+                        <i class="material-icons left">email</i> Google
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

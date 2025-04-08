@@ -46,7 +46,7 @@ builder.Services.AddSingleton<IIdentitySeed, IdentitySeed>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services
     .AddConfig(builder.Configuration)
-    .AddMyDependencyGroup();
+    .AddMyDependencyGroup(builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
