@@ -22,6 +22,7 @@
                     <thead>
                         <tr>
                             <th data-field="Email">Email</th>
+                            <th data-field="UserName">Name</th>
                             <th data-field="IsActive">Is Active</th>
                             <th data-field="IsActiveImg">Is Active</th>
                             <th data-field="Actions">Edit User</th>
@@ -30,15 +31,15 @@
                     <tbody>
                         @foreach (var user in Model.Customers)
                         {
-
                             var identity = await UserManager.GetClaimsAsync(user);
+                            var isActiveClaim = identity.SingleOrDefault(p => p.Type == "IsActive");
+                            var isActive = isActiveClaim != null && Boolean.Parse(isActiveClaim.Value);
                             <tr>
                                 <td>@user.Email</td>
+                                <td>@user.UserName</td>
+                                <td>@isActive</td>
                                 <td>
-                                    @(Boolean.Parse(identity.SingleOrDefault(p => p.Type == "IsActive")?.Value) ? "True" : "False")
-                                </td>
-                                <td>
-                                    <img src="@(Boolean.Parse(identity.SingleOrDefault(p => p.Type == "IsActive").Value) ? "/images/green_tick.png" : "/images/red_cross.png")" alt="Is Active" class="responsive-img" />
+                                    <img src="@(isActive ? "/images/green_tick.png" : "/images/red_cross.png")" alt="Is Active" class="responsive-img" />
                                 </td>
                                 <td>
                                     <i class="small material-icons edit cursor-hand">
@@ -74,11 +75,17 @@
                 <h5>Customer Details</h5>
             </div>
             <div class="divider"></div>
-            <form asp-controller="Account" asp-action="Customers" method="post" class="col s12" id="fromUser">
+            <form action="/Accounts/Account/Customers" method="post" class="col s12" id="fromUser">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Registration.IsEdit" />
                 <input type="hidden" asp-for="Registration.Email" />
                 <div class="input-field col s4">
                     <input asp-for="Registration.Email" id="Input_Registration_Email" />
                     <label asp-for="Registration.Email"></label>
+                </div>
+                <div class="input-field col s4">
+                    <input asp-for="Registration.UserName" class="validate" />
+                    <label asp-for="Registration.UserName"></label>
                 </div>
                 <div class="input-field col s4">
                     <div class="switch">
@@ -89,77 +96,74 @@
                             Active
                         </label>
                     </div>
-
                 </div>
                 <div class="input-field col s4 right-align">
                     <button class="btn waves-effect waves-light btnSubmit" type="submit" name="action">
                         Save
                         <i class="material-icons right">send</i>
                     </button>
-                    <button class="btn waves-effect waves-light reset  red lighten-1" type="button" name="action">
+                    <button class="btn waves-effect waves-light reset red lighten-1" type="button" name="action">
                         Reset
                     </button>
                 </div>
                 <div class="row col s12 right-align" asp-validation-summary="All"></div>
             </form>
-
         </div>
         <div class="row"></div>
-
     </div>
-
 </div>
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Initialize DataTable to show list of Engineers
+            M.AutoInit();
+
+            // Initialize DataTable to show list of Customers
             var table = $('#tblCustomers').DataTable({
                 'pageLength': 3,
                 // Number of records to be displayed per page
-                'lengthMenu': [[3, 5, 10, -1], [3, 5, 10, 'All']]
+                'lengthMenu': [[3, 5, 10, -1], [3, 5, 10, 'All']],
+                'columnDefs': [
+                    { 'targets': 2, 'visible': false }
+                ]
             });
 
             // Set Styles for DataTable and Number of Records to be displayed dropdown
             $('#tblCustomers').css("width", "100%");
-            $('select[name="tblCustomers_length"]').material_select();
+            $('select[name="tblCustomers_length"]').addClass('browser-default');
 
-            // Get the column API object
-            var isActiveColumn = table.column(1);
-            isActiveColumn.visible(false);
-
-            // Handle Reset fucntionality
+            // Handle Reset functionality
             $(document).on("click", ".reset", function () {
                 $('#fromUser')[0].reset();
                 $('#Input_Registration_Email').removeAttr('disabled');
+                $('#Registration_IsActive').removeAttr('disabled');
+                $('#Registration_IsEdit').val('False');
+                M.updateTextFields();
             });
 
-            // This is required to disable Email filed on Server side model validation failure.
+            // This is required to disable Email field on Server side model validation failure
             if ($('#Registration_IsEdit').val() === 'True') {
                 $('#Input_Registration_Email').attr('disabled', 'disabled');
+                $('#Registration_IsActive').removeAttr('disabled');
             }
 
             // On click of Edit icon, populate the details section with details of Customer
             $(document).on('click', '.edit', function () {
-                var user = $('#tblCustomers').DataTable().row($(this).parents('tr')).data();
+                var rowData = table.row($(this).parents('tr')).data();
+                var isActiveValue = rowData[2] === 'True';
 
                 $('#Registration_IsEdit').val('True');
+                $('#Input_Registration_Email').val(rowData[0]).attr('disabled', 'disabled');
+                $('#Registration_UserName').val(rowData[1]).addClass('valid');
+                $('#Registration_IsActive').prop('checked', isActiveValue).removeAttr('disabled');
 
-                $('#Input_Registration_Email').val(user[0]);
-                $('#Input_Registration_Email').attr('disabled', 'disabled');
-
-                $('#Registration_IsActive').prop('checked', user[1] === 'True' ? true : false);
-
-                Materialize.updateTextFields();
+                M.updateTextFields();
             });
 
             // Set hidden Email field to correct value from UI field
-            // This is required for
             $(document).on('click', '.btnSubmit', function () {
                 $('#Registration_Email').val($('#Input_Registration_Email').val());
-                Materialize.updateTextFields();
             });
-
         });
     </script>
 }

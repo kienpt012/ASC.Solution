@@ -25,6 +25,8 @@
 </form>
 <form class="hide" method="post" id="resetPassword_form" asp-area="Identity" asp-page="/Account/InitiateResetPassword">
 </form>
+<form class="hide" method="post" id="profile_form" asp-controller="Account" asp-action="Profile" asp-area="Accounts">
+</form>
 
 <!-- Side NavBar -->
 <ul id="slide-out" class="sidenav">
@@ -82,6 +84,7 @@
                     <ul>
                         <li><a href="#!" id="ancrResetPassword" class="waves-effect"><i class="material-icons">lock</i>Reset Password</a></li>
                         <li><a href="#!" id="ancrLogout" class="waves-effect"><i class="material-icons">exit_to_app</i>Logout</a></li>
+                        <li><a href="#!" id="ancrProfile" class="waves-effect"><i class="material-icons">person</i>Profile</a></li>
                     </ul>
                 </div>
             </li>
@@ -153,7 +156,10 @@
                 e.preventDefault();
                 $('#logout_form').submit();
             });
-
+                    $('#ancrProfile').click(function (e) {
+            e.preventDefault();
+            window.location.href = '/Accounts/Account/Profile';
+        });
             // Handle reset password
             $('#ancrResetPassword').click(function (e) {
                 e.preventDefault();
@@ -165,6 +171,14 @@
                 coverTrigger: false,
                 constrainWidth: false
             });
+
+        });
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.sidenav').sidenav();
+            $('.collapsible').collapsible();
+            $('.dropdown-trigger').dropdown(); // Dropdown Admin Menu
         });
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

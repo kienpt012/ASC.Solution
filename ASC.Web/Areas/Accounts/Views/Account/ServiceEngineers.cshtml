@@ -70,7 +70,8 @@
                 <h5>Service Engineer Details</h5>
             </div>
             <div class="divider"></div>
-            <form asp-controller="Account" asp-action="ServiceEngineers" method="post" class="col s12" id="fromUser">
+            <form action="/Accounts/Account/ServiceEngineers" method="post" class="col s12" id="fromUser">
+                @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="Registration.IsEdit" />
                 <input type="hidden" asp-for="Registration.Email" />
                 <div class="input-field col s4">

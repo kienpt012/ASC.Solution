@@ -9,7 +9,7 @@ namespace ASC.Web.Areas.Accounts.Models
     public class ServiceEngineerViewModel
     {
         // Khai báo nullable vì ServiceEngineers có thể null
-        public List<IdentityUser> ServiceEngineers { get; set; }
+        public List<IdentityUser>? ServiceEngineers { get; set; }
 
         // Thêm required vì Registration luôn cần được khởi tạo
         public ServiceEngineerRegistrationViewModel Registration { get; set; }

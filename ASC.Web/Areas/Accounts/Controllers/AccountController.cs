@@ -5,37 +5,33 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc; 
+using Microsoft.AspNetCore.Mvc;
 using ASC.Web.Services;
 using ASC.Web.Areas.Accounts.Models;
 using ASC.Utilities;
 
 namespace ASC.Web.Areas.Accounts.Controllers
 {
-    [Authorize]
     [Area("Accounts")]
+    [Authorize]
     public class AccountController : Controller
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly IEmailSender _emailSender;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly IEmailSender _emailSender;
 
-        public AccountController(UserManager<IdentityUser> userManager, IEmailSender emailSender, SignInManager<IdentityUser> signInManager)
+        public AccountController(
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager,
+            IEmailSender emailSender)
         {
             _userManager = userManager;
-            _emailSender = emailSender;
             _signInManager = signInManager;
+            _emailSender = emailSender;
         }
 
-        // GET: /Accounts/Index
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        // GET: /Accounts/ServiceEngineers
-        [Authorize(Roles = "Admin")]
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ServiceEngineers()
         {
             var serviceEngineers = await _userManager.GetUsersInRoleAsync(Roles.Engineer.ToString());
@@ -50,13 +46,16 @@ namespace ASC.Web.Areas.Accounts.Controllers
             });
         }
 
-        // POST: /Accounts/ServiceEngineers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
+        [Route("Accounts/Account/ServiceEngineers")]
+
         public async Task<IActionResult> ServiceEngineers(ServiceEngineerViewModel serviceEngineer)
         {
-            serviceEngineer.ServiceEngineers = HttpContext.Session.GetSession<List<IdentityUser>>("ServiceEngineers");
+            var engineers = HttpContext.Session.GetSession<List<IdentityUser>>("ServiceEngineers");
+            serviceEngineer.ServiceEngineers = engineers ?? new List<IdentityUser>();
+
             if (!ModelState.IsValid)
             {
                 return View(serviceEngineer);
@@ -66,6 +65,11 @@ namespace ASC.Web.Areas.Accounts.Controllers
             {
                 // Update User
                 var user = await _userManager.FindByEmailAsync(serviceEngineer.Registration.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "User with this email does not exist.");
+                    return View(serviceEngineer);
+                }
                 user.UserName = serviceEngineer.Registration.UserName;
                 IdentityResult result = await _userManager.UpdateAsync(user);
 
@@ -86,7 +90,6 @@ namespace ASC.Web.Areas.Accounts.Controllers
                 }
 
                 // Update claims
-                user = await _userManager.FindByEmailAsync(serviceEngineer.Registration.Email);
                 var identity = await _userManager.GetClaimsAsync(user);
                 var isActiveClaim = identity.SingleOrDefault(p => p.Type == "IsActive");
                 var removeClaimResult = await _userManager.RemoveClaimAsync(user, new System.Security.Claims.Claim(isActiveClaim.Type, isActiveClaim.Value));
@@ -94,6 +97,14 @@ namespace ASC.Web.Areas.Accounts.Controllers
             }
             else
             {
+                // Check if email already exists
+                var existingUser = await _userManager.FindByEmailAsync(serviceEngineer.Registration.Email);
+                if (existingUser != null)
+                {
+                    ModelState.AddModelError("", "A user with this email already exists.");
+                    return View(serviceEngineer);
+                }
+
                 // Create User
                 IdentityUser user = new IdentityUser
                 {
@@ -123,8 +134,11 @@ namespace ASC.Web.Areas.Accounts.Controllers
 
             if (serviceEngineer.Registration.IsActive)
             {
+                var user = await _userManager.FindByEmailAsync(serviceEngineer.Registration.Email);
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var resetLink = Url.Action("ResetPassword", "Account", new { token = token, email = user.Email }, protocol: HttpContext.Request.Scheme);
                 await _emailSender.SendEmailAsync(serviceEngineer.Registration.Email, "Account Created/Modified",
-                $"Email : {serviceEngineer.Registration.Email} /n Password : {serviceEngineer.Registration.Password}");
+                    $"Your account has been created/modified. Please reset your password here: {resetLink}");
             }
             else
             {
@@ -134,22 +148,13 @@ namespace ASC.Web.Areas.Accounts.Controllers
             return RedirectToAction("ServiceEngineers");
         }
 
-        #region Helpers
-
-        private void AddErrors(IdentityResult result)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-        }
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Customers()
         {
             var users = await _userManager.GetUsersInRoleAsync(Roles.User.ToString());
 
-            // Hold all service engineers in session
+            // Hold all customers in session
             HttpContext.Session.SetSession("Customers", users);
 
             return View(new CustomersViewModel
@@ -158,21 +163,42 @@ namespace ASC.Web.Areas.Accounts.Controllers
                 Registration = new CustomerRegistrationViewModel()
             });
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
+        [Route("Accounts/Account/Customers")]
         public async Task<IActionResult> Customers(CustomersViewModel customer)
         {
-            customer.Customers = HttpContext.Session.GetSession<List<IdentityUser>>("ServiceEngineers");
+            var customers = HttpContext.Session.GetSession<List<IdentityUser>>("Customers");
+            customer.Customers = customers ?? new List<IdentityUser>();
             if (!ModelState.IsValid)
             {
                 return View(customer);
             }
-
             var user = await _userManager.FindByEmailAsync(customer.Registration.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError("", "User with this email does not exist.");
+                return View(customer);
+            }
+
+            // Update username if it has changed
+            if (user.UserName != customer.Registration.UserName)
+            {
+                user.UserName = customer.Registration.UserName;
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    foreach (var error in updateResult.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                    return View(customer);
+                }
+            }
 
             // Update claims
-            user = await _userManager.FindByEmailAsync(customer.Registration.Email);
             var identity = await _userManager.GetClaimsAsync(user);
             var isActiveClaim = identity.SingleOrDefault(p => p.Type == "IsActive");
             var removeClaimResult = await _userManager.RemoveClaimAsync(user,
@@ -183,20 +209,58 @@ namespace ASC.Web.Areas.Accounts.Controllers
             if (!customer.Registration.IsActive)
             {
                 await _emailSender.SendEmailAsync(customer.Registration.Email,
-                    "Account Deativated",
+                    "Account Deactivated",
                     $"Your account has been Deactivated!!!");
             }
             else
             {
                 await _emailSender.SendEmailAsync(customer.Registration.Email,
                     "Account Modified",
-                    $"Your account has been Activated Email : {customer.Registration.Email}");
+                    $"Your account has been {(user.UserName != customer.Registration.UserName ? "Updated" : "Activated")} Email: {customer.Registration.Email}");
             }
 
             return RedirectToAction("Customers");
         }
 
-        #endregion
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            var user = HttpContext.User.GetCurrentUserDetails();
+            return View(new ProfileViewModel() { Username = user.Name });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("Accounts/Account/Profile")]
+        public async Task<IActionResult> Profile(ProfileViewModel profile)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            // Update userName
+            var user = await _userManager.FindByEmailAsync(HttpContext.User.GetCurrentUserDetails().Email);
+            user.UserName = profile.Username;
+            IdentityResult result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                result.Errors.ToList().ForEach(p => ModelState.AddModelError("", p.Description));
+                return View();
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+
+            return RedirectToAction("Profile", "Account", new { area = "Accounts" });
+        }
+
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+        }
     }
 
     // Enum definition
