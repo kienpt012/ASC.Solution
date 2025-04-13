@@ -12,86 +12,39 @@
     <nav class="top-nav blue-grey lighten-1">
         <div class="nav-wrapper row valign-wrapper">
             <div class="col s12 valign-wrapper">
-                <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                 <h5><a class="page-title">Automobile Service Center</a></h5>
             </div>
         </div>
     </nav>
+
+    <ul id="nav-mobile" class="sidenav sidenav-fixed">
+        <li>
+            <div class="user-view">
+                <div class="background blue-grey lighten-1"></div>
+                <a href="#!user"><img class="circle" src="~/images/avartar.jpg"></a>
+                <a href="#!name"><span class="white-text name">@currentUser.Name</span></a>
+                <a href="#!email"><span class="white-text email">@currentUser.Email</span></a>
+            </div>
+        </li>
+        @await Component.InvokeAsync("ASC.Web.Navigation.LeftNavigation", await navigationCache.GetNavigationCacheAsync())
+    </ul>
+    <form class="hide" method="post" id="logout_form" asp-area="Identity" asp-page="/Account/Logout">
+        <input type="submit" value="Logout" />
+    </form>
+
+    <form class="hide" method="post" id="resetPassword_form" asp-area="Identity" asp-page="/Account/InitiateResetPassword">
+    </form>
 </header>
 
-<!-- Hidden Forms for Authentication -->
-<form class="hide" method="post" id="logout_form" asp-area="Identity" asp-page="/Account/Logout">
-    <input type="submit" value="Logout" />
-</form>
-<form class="hide" method="post" id="resetPassword_form" asp-area="Identity" asp-page="/Account/InitiateResetPassword">
-</form>
-<form class="hide" method="post" id="profile_form" asp-controller="Account" asp-action="Profile" asp-area="Accounts">
-</form>
-
-<!-- Side NavBar -->
-<ul id="slide-out" class="sidenav">
-    <li>
-        <div class="user-view">
-            <div class="background">
-                <img src="~/images/bg1.jpg">
-            </div>
-            <a href="#user"><img class="circle" src="~/images/avartar.jpg"></a>
-            <a href="#name"><span class="white-text name">@currentUser.Name</span></a>
-            <a href="#email"><span class="white-text email">@currentUser.Email</span></a>
+<!--Render Body-->
+<main class="secureLayout">
+    <div class="row margin-bottom-0px">
+        <div class="col s12">
+            @RenderBody()
         </div>
-    </li>
-    <li><a href="#!"><i class="material-icons">dashboard</i>Dashboard</a></li>
-    <li>
-        @if (currentUser.Roles.Contains("Admin"))
-        {
-            <ul class="collapsible collapsible-accordion">
-                <li>
-                    <!-- Dropdown Trigger -->
-                    <a class="dropdown-trigger" href="#" data-target="dropdown1">User Administration<i class="material-icons right">arrow_drop_down</i></a>
-
-                    <!-- Dropdown Structure -->
-                    <ul id="dropdown1" class="dropdown-content">
-                        <li><a href="/Accounts/Account/ServiceEngineers">Manage Engineer</a></li>
-                        <li><a href="/Accounts/Account/Customers">Manage Customer</a></li>
-                        <li><a href="#!">Deactivate Users</a></li>
-                    </ul>
-                </li>
-            </ul>
-        }
-    </li>
-    <li>
-        <a class="collapsible-header" href="#!">
-            <i class="material-icons">perm_data_setting</i>Service Requests
-        </a>
-    </li>
-    <li>
-        <a class="collapsible-header" href="#!">
-            <i class="material-icons">message</i>Service Notifications
-        </a>
-    </li>
-    <li>
-        <a class="collapsible-header" href="#!">
-            <i class="material-icons">inbox</i>Promotions
-        </a>
-    </li>
-    <li>
-        <ul class="collapsible collapsible-accordion">
-            <li>
-                <a class="collapsible-header" href="#!">
-                    <i class="material-icons">settings</i>Settings<i class="material-icons right">arrow_drop_down</i>
-                </a>
-                <div class="collapsible-body">
-                    <ul>
-                        <li><a href="#!" id="ancrResetPassword" class="waves-effect"><i class="material-icons">lock</i>Reset Password</a></li>
-                        <li><a href="#!" id="ancrLogout" class="waves-effect"><i class="material-icons">exit_to_app</i>Logout</a></li>
-                        <li><a href="#!" id="ancrProfile" class="waves-effect"><i class="material-icons">person</i>Profile</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </li>
-</ul>
-<a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+    </div>
+</main>
 
 <!-- Render Body -->
 <main class="secureLayout">
@@ -102,13 +55,18 @@
     </div>
 </main>
 
-<!-- Footer -->
+
+<!--Footer-->
 <footer class="page-footer blue-grey lighten-1 secureLayout">
     <div class="row">
         <div class="col l6 s12">
             <h5 class="white-text">About Us</h5>
             <p class="grey-text text-lighten-4">
-                Automobile Service Center is a certified company to perform car services. Our workshop operations started in October 2010. We primarily focus on providing better services to our customers, and as a result of our hard work, we were awarded as the "Best Service" for the year 2008 within a short period of time.
+                Automobile Service Center is certified Company to perform car services. Our
+                Workshop operations started in the month of October, 2010.
+                We primarily focus on providing better services to our customers, and as a
+                result of the hard work we were awarded as the "Best Service" for the year
+                2008 and that too within a short period of time.
             </p>
         </div>
         <div class="col l3 s12">
@@ -127,7 +85,7 @@
                 <li><a class="white-text" href="#!">Facebook</a></li>
                 <li><a class="white-text" href="#!">LinkedIn</a></li>
                 <li><a class="white-text" href="#!">Twitter</a></li>
-                <li><a class="white-text" href="#!">YouTube</a></li>
+                <li><a class="white-text" href="#!">Youtube</a></li>
             </ul>
         </div>
     </div>
@@ -137,48 +95,23 @@
         </div>
     </div>
 </footer>
-
 @section Scripts {
     @RenderSection("Scripts", required: false)
+
     <script type="text/javascript">
-        $(document).ready(function () {
-            // Initialize sidenav
-            $('.sidenav').sidenav({
-                edge: 'left', // Đảm bảo sidenav mở từ trái
-                draggable: true // Cho phép kéo trên thiết bị cảm ứng
-            });
-
-            // Initialize collapsible elements
-            $('.collapsible').collapsible();
-
-            // Handle logout button
-            $('#ancrLogout').click(function (e) {
-                e.preventDefault();
+        $(function () {
+            $('#ancrLogout').click(function () {
                 $('#logout_form').submit();
             });
-                    $('#ancrProfile').click(function (e) {
-            e.preventDefault();
-            window.location.href = '/Accounts/Account/Profile';
-        });
-            // Handle reset password
-            $('#ancrResetPassword').click(function (e) {
-                e.preventDefault();
+            $('#ancrResetPassword').click(function () {
                 $('#resetPassword_form').submit();
             });
-
-            // Initialize dropdown
-            $('.dropdown-trigger').dropdown({
-                coverTrigger: false,
-                constrainWidth: false
-            });
-
         });
     </script>
+
     <script type="text/javascript">
         $(document).ready(function () {
-            $('.sidenav').sidenav();
             $('.collapsible').collapsible();
-            $('.dropdown-trigger').dropdown(); // Dropdown Admin Menu
         });
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

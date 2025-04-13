@@ -123,7 +123,7 @@ namespace ASC.Web.Areas.Identity.Pages.Account
                     return Page();
                 }
                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
-                return LocalRedirect(returnUrl);
+                return RedirectToRoute("areaRoute", new { area = "ServiceRequests", controller = "Dashboard", action = "Dashboard" });
             }
             if (result.IsLockedOut)
             {
@@ -163,7 +163,11 @@ namespace ASC.Web.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, "User");
-                    await _userManager.AddClaimAsync(user, new Claim("IsActive", "true"));
+                    await _userManager.AddClaimsAsync(user, new List<System.Security.Claims.Claim>
+                    {
+                        new System.Security.Claims.Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", user.Email),
+                        new System.Security.Claims.Claim("IsActive", "true")
+                    });
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
@@ -188,7 +192,8 @@ namespace ASC.Web.Areas.Identity.Pages.Account
                         }
 
                         await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
-                        return LocalRedirect(returnUrl);
+                        _logger.LogInformation(6, "User created an account using {Name} provier", info.LoginProvider);
+                        return RedirectToRoute("areaRoute", new { area = "ServiceRequests", controller = "Dashboard", action = "Dashboard" });
                     }
                 }
                 foreach (var error in result.Errors)

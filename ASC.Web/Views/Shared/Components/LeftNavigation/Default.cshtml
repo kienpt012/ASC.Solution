@@ -4,41 +4,49 @@
 @inject IHttpContextAccessor UserHttpContext
 
 @{
-    var currentUser = UserHttpContext.HttpContext?.User.GetCurrentUserDetails();
+    var currentUser = UserHttpContext.HttpContext.User.GetCurrentUserDetails();
 }
 
 @foreach (var menuItem in Model.MenuItems)
 {
-    if (currentUser.Roles.Intersect(menuItem.UserRoles).Any())
+    @if (currentUser.Roles.Intersect(menuItem.UserRoles).Any())
     {
         if (menuItem.IsNested)
         {
-            <ul class="collapsible collapsible-accordion">
-                <li>
-                    <a class="collapsible-header" id="@string.Format("anchor{0}", menuItem.DisplayName.Replace(" ", ""))" href="javascript:void(0);">@menuItem.DisplayName</a>
-                    <span class="material-icons">@menuItem.MaterialIcon</span>
-                    <div class="collapsible-body">
-                        @foreach (var subMenuItem in menuItem.NestedItems.OrderBy(p => p.Sequence).ToList())
-                        {
-                            if (currentUser.Roles.Intersect(subMenuItem.UserRoles).Any())
-                            {
-                                <ul>
-                                    <li>
-                                        <a href="@subMenuItem.Link" id="@string.Format("anchor{0}", subMenuItem.DisplayName.Replace(" ", ""))" class="collapsible-header">@subMenuItem.DisplayName</a>
-                                        <span class="material-icons">@subMenuItem.MaterialIcon</span>
-                                    </li>
-                                </ul>
-                            }
-                        }
-                    </div>
-                </li>
-            </ul>
+            <li>
+                <ul class="collapsible collapsible-accordion">
+                    <li>
+                        <a class="collapsible-header" id="@string.Format("ancr{0}", menuItem.DisplayName.Replace(" ", ""))">
+                            @menuItem.DisplayName
+                            <i class="material-icons">@menuItem.MaterialIcon</i>
+                        </a>
+                        <div class="collapsible-body">
+                            <ul>
+                                @foreach (var subMenuItem in menuItem.NestedItems.OrderBy(p => p.Sequence).ToList())
+                                {
+                                    if (currentUser.Roles.Intersect(subMenuItem.UserRoles).Any())
+                                    {
+                                        <li>
+                                            <a href="@subMenuItem.Link" id="@string.Format("ancr{0}", subMenuItem.DisplayName.Replace(" ", ""))">
+                                                @subMenuItem.DisplayName
+                                                <i class="material-icons">@subMenuItem.MaterialIcon</i>
+                                            </a>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </li>
         }
         else
         {
             <li>
-                <a href="@menuItem.Link" id="@string.Format("anchor{0}", menuItem.DisplayName.Replace(" ", ""))" class="collapsible-header">@menuItem.DisplayName</a>
-                <span class="material-icons">@menuItem.MaterialIcon</span>
+                <a href="@menuItem.Link" id="@string.Format("ancr{0}", menuItem.DisplayName.Replace(" ", ""))" class="collapsible-header">
+                    <i class="material-icons">@menuItem.MaterialIcon</i>
+                    @menuItem.DisplayName
+                </a>
             </li>
         }
     }
