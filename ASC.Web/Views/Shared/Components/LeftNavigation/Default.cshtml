@@ -2,11 +2,9 @@
 @using ASC.Utilities
 @model ASC.Web.Models.NavigationMenu
 @inject IHttpContextAccessor UserHttpContext
-
 @{
     var currentUser = UserHttpContext.HttpContext.User.GetCurrentUserDetails();
 }
-
 @foreach (var menuItem in Model.MenuItems)
 {
     @if (currentUser.Roles.Intersect(menuItem.UserRoles).Any())
