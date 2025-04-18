@@ -6,6 +6,9 @@ using ASC.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using ASC.Business.Interfaces;
+using ASC.Business;
+using AutoMapper;
 
 namespace ASC.Web.Services
 {
@@ -49,6 +52,11 @@ namespace ASC.Web.Services
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddDistributedMemoryCache();
             services.AddSingleton<INavigationCacheOperations, NavigationCacheOperations>();
+            services.AddScoped<IMasterDataOperations, MasterDataOperations>();
+         //   services.AddScoped<IMasterDataCacheOperations, MasterDataCacheOperations>();
+            services.AddAutoMapper(typeof(ApplicationDbContext));
+         //   services.AddAutoMapper(typeof(MasterDataCache));
+
             ///Add RazorPages - MVC
             services.AddRazorPages();
             services.AddDatabaseDeveloperPageExceptionFilter();

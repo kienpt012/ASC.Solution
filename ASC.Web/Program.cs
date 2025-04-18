@@ -1,6 +1,7 @@
-﻿using ASC.DataAccess;
+﻿using ASC.Business;
+using ASC.Business.Interfaces;
+using ASC.DataAccess;
 using ASC.DataAccess.Interfaces;
-using ASC.Web.Services;
 using ASC.Web.Configuration;
 using ASC.Web.Data;
 using ASC.Web.Services;
@@ -8,7 +9,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.Extensions.Options;
-
+using AutoMapper;
+using OfficeOpenXml;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -41,12 +43,15 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddTransient<IEmailSender, AuthMessageSender>();
 builder.Services.AddTransient<ISmsSender, AuthMessageSender>();
-
+builder.Services.AddScoped<IMasterDataOperations, MasterDataOperations>();
+//builder.Services.AddScoped<IMasterDataCacheOperations, MasterDataCacheOperations>();
+builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddSingleton<IIdentitySeed, IdentitySeed>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services
     .AddConfig(builder.Configuration)
     .AddMyDependencyGroup(builder.Configuration);
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

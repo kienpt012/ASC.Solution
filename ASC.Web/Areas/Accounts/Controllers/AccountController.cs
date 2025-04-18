@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using ASC.Utilities;
+using ASC.Web.Areas.Accounts.Models;
+using ASC.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using ASC.Web.Services;
-using ASC.Web.Areas.Accounts.Models;
-using ASC.Utilities;
+using Microsoft.AspNetCore.WebUtilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ASC.Web.Areas.Accounts.Controllers
 {
@@ -55,7 +57,12 @@ namespace ASC.Web.Areas.Accounts.Controllers
         {
             var engineers = HttpContext.Session.GetSession<List<IdentityUser>>("ServiceEngineers");
             serviceEngineer.ServiceEngineers = engineers ?? new List<IdentityUser>();
-
+            if (serviceEngineer.Registration.IsEdit)
+            {
+                // Loại bỏ validation lỗi cho Password và ConfirmPassword khi đang ở chế độ Edit
+                ModelState.Remove("Registration.Password");
+                ModelState.Remove("Registration.ConfirmPassword");
+            }
             if (!ModelState.IsValid)
             {
                 return View(serviceEngineer);
@@ -63,6 +70,7 @@ namespace ASC.Web.Areas.Accounts.Controllers
 
             if (serviceEngineer.Registration.IsEdit)
             {
+
                 // Update User
                 var user = await _userManager.FindByEmailAsync(serviceEngineer.Registration.Email);
                 if (user == null)
@@ -78,17 +86,18 @@ namespace ASC.Web.Areas.Accounts.Controllers
                     result.Errors.ToList().ForEach(p => ModelState.AddModelError("", p.Description));
                     return View(serviceEngineer);
                 }
-
-                // Update Password
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                IdentityResult passwordResult = await _userManager.ResetPasswordAsync(user, token, serviceEngineer.Registration.Password);
-
-                if (!passwordResult.Succeeded)
+                if(!string.IsNullOrEmpty(serviceEngineer.Registration.Password))
                 {
-                    passwordResult.Errors.ToList().ForEach(p => ModelState.AddModelError("", p.Description));
-                    return View(serviceEngineer);
-                }
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    IdentityResult passwordResult = await _userManager.ResetPasswordAsync(user, token, serviceEngineer.Registration.Password);
 
+                    if (!passwordResult.Succeeded)
+                    {
+                        passwordResult.Errors.ToList().ForEach(p => ModelState.AddModelError("", p.Description));
+                        return View(serviceEngineer);
+                    }
+                }
+                // Update Password
                 // Update claims
                 var identity = await _userManager.GetClaimsAsync(user);
                 var isActiveClaim = identity.SingleOrDefault(p => p.Type == "IsActive");
@@ -139,7 +148,33 @@ namespace ASC.Web.Areas.Accounts.Controllers
                 var resetLink = Url.Action("ResetPassword", "Account", new { token = token, email = user.Email }, protocol: HttpContext.Request.Scheme);
                 await _emailSender.SendEmailAsync(serviceEngineer.Registration.Email, "Account Created/Modified",
                     $"Your account has been created/modified. Please reset your password here: {resetLink}");
-            }
+                //var user = await _userManager.FindByEmailAsync(serviceEngineer.Registration.Email);
+
+                //for (int i = 0; i < 1000; i++)
+                //{
+                //    try
+                //    {
+                //        // Tạo token reset password
+                //        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                //        var encodedCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                //        var resetLink = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/Identity/Account/ResetPassword?userId={user.Id}&code={encodedCode}";
+
+                //        // Tạo mã ngẫu nhiên để tránh nhóm email
+                //        string uniqueId = Guid.NewGuid().ToString().Substring(0, 8);
+                //        string emailSubject = $"Account Created/Modified - admin{i + 1} ({uniqueId})";
+
+                //        // Gửi email
+                //        await _emailSender.SendEmailAsync(
+                //            serviceEngineer.Registration.Email,
+                //            emailSubject,
+                //            $"Your account (admin{i + 1}) has been created/modified. Please reset your password here: {resetLink} (Ref: {uniqueId})");
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        Console.WriteLine($"Failed to send email admin{i + 1} to {serviceEngineer.Registration.Email}: {ex.Message}");
+                //    }
+                //}
+            }   
             else
             {
                 await _emailSender.SendEmailAsync(serviceEngineer.Registration.Email, "Account Deactivated", $"Your account has been deactivated.");
