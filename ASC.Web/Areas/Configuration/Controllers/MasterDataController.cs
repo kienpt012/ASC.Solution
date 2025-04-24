@@ -114,7 +114,7 @@ namespace ASC.Web.Areas.Configuration.Controllers
             {
                 // Insert Master Value
                 masterDataValue.RowKey = Guid.NewGuid().ToString();
-                masterDataValue.PartitionKey = masterValue.PartitionKey;
+                masterDataValue.CreatedBy = HttpContext.User.GetCurrentUserDetails().Name;               
                 await _masterData.InsertMasterValueAsync(masterDataValue);
             }
 
@@ -123,7 +123,6 @@ namespace ASC.Web.Areas.Configuration.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("Configuration/MasterData/UploadExcel")]
         public async Task<IActionResult> UploadExcel()
         {
             var files = Request.Form.Files;
@@ -158,7 +157,7 @@ namespace ASC.Web.Areas.Configuration.Controllers
                 using (ExcelPackage package = new ExcelPackage(memoryStream))
                 {
                     // Get the first Excel sheet from the Workbook
-                    ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
                     int rowCount = worksheet.Dimension.Rows;
 
                     // Iterate all the rows and create the list of MasterDataValue
