@@ -16,8 +16,6 @@ namespace ASC.Model.Models
         }
         public MasterDataValue() { }
 
-
-
         public bool IsActive { get; set; }
         public string Name { get; set; }
     }

@@ -1,6 +1,7 @@
 ﻿using ASC.Business.Interfaces;
 using ASC.DataAccess.Interfaces;
 using ASC.Model.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,6 +70,7 @@ namespace ASC.Business
                 masterKey.IsActive = key.IsActive;
                 masterKey.IsDeleted = key.IsDeleted;
                 masterKey.Name = key.Name;
+                masterKey.UpdatedBy = masterKey.UpdatedBy;
                 _unitOfWork.Repository<MasterDataKey>().Update(masterKey);
                 _unitOfWork.CommitTransaction();
                 return true;
