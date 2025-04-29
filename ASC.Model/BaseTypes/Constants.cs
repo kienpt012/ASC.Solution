@@ -12,17 +12,17 @@ namespace ASC.Model
 
     public enum Roles
     {
-        Admin, Engineer, User
+        Admin,Engineer,User
     }
 
     public enum MasterKeys
     {
-        VehicleName, VehicleType
+        VehicleName,VehicleType
     }
 
     public enum Status
     {
-        New, Denied, Pending, Initiated, InProgress, PendingCustomerApproval,
-        RequestForInformation, Completed
+        New,Denied,Pending,Initiated,InProgress,PendingCustomerApproval,
+        RequestForInformation,Completed
     }
 }
