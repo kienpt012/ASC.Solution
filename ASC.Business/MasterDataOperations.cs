@@ -96,21 +96,33 @@ namespace ASC.Business
         {
             using (_unitOfWork)
             {
+                // Tạo một danh sách để theo dõi các PartitionKey đã xử lý trong lần upload này
+                HashSet<string> processedPartitionKeys = new HashSet<string>();
+
+                // Lấy tất cả MasterKeys hiện có từ database
+                var existingMasterKeys = await GetAllMasterKeysAsync();
+                HashSet<string> existingPartitionKeys = new HashSet<string>(
+                    existingMasterKeys.Select(mk => mk.PartitionKey));
+
                 foreach (var value in values)
                 {
-                    // Find, if null insert MasterKey
-                    var masterKey = await GetMaserKeyByNameAsync(value.PartitionKey);
-                    if (!masterKey.Any())
+                    // Kiểm tra xem PartitionKey đã tồn tại trong DB hoặc đã được xử lý trong lần upload này chưa
+                    if (!existingPartitionKeys.Contains(value.PartitionKey) &&
+                        !processedPartitionKeys.Contains(value.PartitionKey))
                     {
+                        // Thêm MasterKey mới
                         await _unitOfWork.Repository<MasterDataKey>().AddAsync(new MasterDataKey()
                         {
                             Name = value.PartitionKey,
                             RowKey = Guid.NewGuid().ToString(),
                             PartitionKey = value.PartitionKey
                         });
+
+                        // Đánh dấu PartitionKey này đã được xử lý
+                        processedPartitionKeys.Add(value.PartitionKey);
                     }
 
-                    // Find, if null Insert MasterValue
+                    // Xử lý MasterValue
                     var masterValuesByKey = await GetAllMasterValuesByKeyAsync(value.PartitionKey);
                     var masterValue = masterValuesByKey.FirstOrDefault(p => p.Name == value.Name);
                     if (masterValue == null)
@@ -122,11 +134,9 @@ namespace ASC.Business
                         masterValue.IsActive = value.IsActive;
                         masterValue.IsDeleted = value.IsDeleted;
                         masterValue.Name = value.Name;
-
                         _unitOfWork.Repository<MasterDataValue>().Update(masterValue);
                     }
                 }
-
                 _unitOfWork.CommitTransaction();
                 return true;
             }
