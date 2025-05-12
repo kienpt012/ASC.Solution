@@ -46,12 +46,19 @@ namespace ASC.Web.Services
                     Options.ClientId = config["Google:Identity:ClientId"];
                     Options.ClientSecret = config["Google:Identity:ClientSecret"]; // Fixed "ClientId" to "ClientSecret"
                 });
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = config.GetSection("CacheSettings:CacheConnectionString").Value;
+                options.InstanceName = config.GetSection("CacheSettings:CacheInstance").Value;
+            });
             ///---
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddSession();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddDistributedMemoryCache();
+            services.AddScoped<IServiceRequestOperations, ServiceRequestOperations>();
             services.AddSingleton<INavigationCacheOperations, NavigationCacheOperations>();
+            services.AddScoped<IMasterDataCacheOperations, MasterDataCacheOperations>();
             services.AddScoped<IMasterDataOperations, MasterDataOperations>();
          //   services.AddScoped<IMasterDataCacheOperations, MasterDataCacheOperations>();
             services.AddAutoMapper(typeof(ApplicationDbContext));

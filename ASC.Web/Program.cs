@@ -103,4 +103,9 @@ using (var scope = app.Services.CreateScope())
     var navigationcacheoperations = scope.ServiceProvider.GetRequiredService<INavigationCacheOperations>();
     await navigationcacheoperations.CreateNavigationCacheAsync();
 }
+using (var scope = app.Services.CreateScope())
+{
+    var masterdatacacheoperations = scope.ServiceProvider.GetRequiredService<IMasterDataCacheOperations>();
+    await masterdatacacheoperations.CreateMasterDataCacheAsync();
+}
 app.Run();
