@@ -1,0 +1,55 @@
+.confirmation-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.confirmation-container h1 {
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.confirmation-container p {
+    color: #666;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.confirmation-link {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background-color: #26a69a;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.confirmation-link:hover {
+    background-color: #2bbbad;
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .confirmation-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .confirmation-container h1 {
+        font-size: 1.75rem;
+    }
+
+    .confirmation-container p {
+        font-size: 1rem;
+    }
+} 

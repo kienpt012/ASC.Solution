@@ -60,6 +60,7 @@ namespace ASC.Web.Areas.Identity.Pages.Account
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     ModelState.AddModelError(string.Empty, "Email không tồn tại trong hệ thống");
+                    return Page();
                 }
 
                 // For more information on how to enable account confirmation and password reset please

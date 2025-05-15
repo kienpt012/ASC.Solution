@@ -1,0 +1,123 @@
+.login-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h1 {
+    color: #333;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.login-container .form-floating {
+    margin-bottom: 1rem;
+}
+
+.login-container .form-control:focus {
+    border-color: #26a69a;
+    box-shadow: 0 0 0 0.25rem rgba(38, 166, 154, 0.25);
+}
+
+.login-container .btn-primary {
+    width: 100%;
+    background-color: #26a69a;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+}
+
+.login-container .btn-primary:hover {
+    background-color: #2bbbad;
+    transform: translateY(-2px);
+}
+
+.login-container .text-danger {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.login-options {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+.login-options p {
+    margin-bottom: 0.5rem;
+}
+
+.login-options a {
+    color: #26a69a;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.login-options a:hover {
+    color: #2bbbad;
+    text-decoration: underline;
+}
+
+.external-auth {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.external-auth .btn {
+    margin: 0.5rem;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background-color: #db4437;
+    color: white;
+    border: none;
+}
+
+.external-auth .btn:hover {
+    transform: translateY(-2px);
+    background-color: #c1351d;
+}
+
+.validation-summary-errors {
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.validation-summary-errors ul {
+    margin-bottom: 0;
+    padding-left: 1.5rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.remember-me input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .login-container h1 {
+        font-size: 1.75rem;
+    }
+} 

@@ -2,6 +2,15 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
+using ASC.Web.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
@@ -9,14 +18,6 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
-using ASC.Web.Services;
 
 namespace ASC.Web.Areas.Identity.Pages.Account
 {
@@ -119,8 +120,8 @@ namespace ASC.Web.Areas.Identity.Pages.Account
                 var isActive = Boolean.Parse(list.SingleOrDefault(p => p.Type == "IsActive")?.Value ?? "true"); // Fallback to true if claim is missing
                 if (!isActive)
                 {
-                    ModelState.AddModelError(string.Empty, "Account has been locked");
-                    return Page();
+                    ErrorMessage = "Account has been locked";
+                    return RedirectToPage("./Login");
                 }
                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
                 return RedirectToRoute("areaRoute", new { area = "ServiceRequests", controller = "Dashboard", action = "Dashboard" });
