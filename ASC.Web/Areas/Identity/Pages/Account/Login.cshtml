@@ -27,8 +27,10 @@
         </div>
         
         <div class="remember-me">
-            <input asp-for="Input.RememberMe" type="checkbox" />
-            <label asp-for="Input.RememberMe">Remember me</label>
+            <label>
+                <input asp-for="Input.RememberMe" type="checkbox" />
+                <span>@Html.DisplayNameFor(m => m.Input.RememberMe)</span>
+            </label>
         </div>
         
         <button type="submit" class="btn btn-primary">Log in</button>

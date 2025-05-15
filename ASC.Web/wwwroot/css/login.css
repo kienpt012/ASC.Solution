@@ -108,7 +108,16 @@
 }
 
 .remember-me input[type="checkbox"] {
-    margin-right: 0.5rem;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.remember-me label {
+    cursor: pointer;
+    user-select: none;
+    color: #555;
 }
 
 @media (max-width: 768px) {
