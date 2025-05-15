@@ -1,61 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using ASC.Model.BaseTypes;
+using ASC.Model.Models;
 using Microsoft.WindowsAzure.Storage.Table;
-
+using ASC.Models;
+using ASC.Utilities;
 namespace ASC.Models.Queries
 {
-    public class Queries
+    public static class Queries
     {
-        public static string GetDashboardQuery(DateTime? requestedDate,
+        public static Expression<Func<ServiceRequest, bool>> GetDashboardQuery<T>(DateTime? requestedDate,
             List<string> status = null,
             string email = "",
             string serviceEngineerEmail = "")
         {
-            var finalQuery = string.Empty;
-            var statusQueries = new List<string>();
+            var query = (Expression<Func<ServiceRequest, bool>>)(x => true);
 
             // Add Requested Date Clause
             if (requestedDate.HasValue)
             {
-                finalQuery = TableQuery.GenerateFilterConditionForDate("RequestedDate", QueryComparisons.GreaterThanOrEqual, requestedDate.Value);
+                var requestedDateFilter = (Expression<Func<ServiceRequest, bool>>)(u => u.RequestedDate >= requestedDate);
+                query  = query.And(requestedDateFilter);
             }
 
             // Add Email clause if email is passed as a parameter
             if (!string.IsNullOrWhiteSpace(email))
             {
-                finalQuery = !string.IsNullOrWhiteSpace(finalQuery)
-                    ? TableQuery.CombineFilters(finalQuery, TableOperators.And, TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, email))
-                    : TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, email);
+                var requestedDateFilter = (Expression<Func<ServiceRequest, bool>>)(u => u.PartitionKey == email);
+                query = query.And(requestedDateFilter);
             }
 
             // Add Service Engineer Email clause if email is passed as a parameter
             if (!string.IsNullOrWhiteSpace(serviceEngineerEmail))
             {
-                finalQuery = !string.IsNullOrWhiteSpace(finalQuery)
-                    ? TableQuery.CombineFilters(finalQuery, TableOperators.And, TableQuery.GenerateFilterCondition("ServiceEngineer", QueryComparisons.Equal, serviceEngineerEmail))
-                    : TableQuery.GenerateFilterCondition("ServiceEngineer", QueryComparisons.Equal, serviceEngineerEmail);
+                var requestedDateFilter = (Expression<Func<ServiceRequest, bool>>)(u => u.ServiceEngineer == serviceEngineerEmail);
+                query = query.And(requestedDateFilter);
             }
 
             // Add Status clause if status is passed as a parameter.
             // Individual status clauses are appended with OR Condition
+            var statusQueries = (Expression<Func<ServiceRequest, bool>>)(x => false);
             if (status != null)
             {
                 foreach (var state in status)
                 {
-                    statusQueries.Add(TableQuery.GenerateFilterCondition("Status", QueryComparisons.Equal, state));
+                    var statusFilter = (Expression<Func<ServiceRequest, bool>>)(u => u.Status == state);
+                    statusQueries = statusQueries.Or(statusFilter);
                 }
-                var statusQuery = string.Join($" {TableOperators.Or} ", statusQueries);
-
-                finalQuery = !string.IsNullOrWhiteSpace(finalQuery)
-                    ? $"{finalQuery} {TableOperators.And} ({statusQuery})"
-                    : $"({statusQuery})";
+                query = query.And(statusQueries);
+                
             }
 
-            return finalQuery;
+            return query;
         }
 
         public static string GetDashboardAuditQuery(string email = "")

@@ -22,4 +22,8 @@
     <Folder Include="NewFolder1\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ASC.Utilities\ASC.Utilities.csproj" />
+  </ItemGroup>
+
 </Project>

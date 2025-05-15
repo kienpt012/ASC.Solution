@@ -31,8 +31,8 @@ namespace ASC.Business
             string email = "",
             string serviceEngineerEmail = "")
         {
-            var query = Queries.GetDashboardQuery(requestedDate, status, email, serviceEngineerEmail);
-            var serviceRequests = await _unitOfWork.Repository<ServiceRequest>().FindAllByPartitionKeyAsync(query);
+            var query = Queries.GetDashboardQuery<ServiceRequest>(requestedDate, status, email, serviceEngineerEmail);
+            var serviceRequests = await _unitOfWork.Repository<ServiceRequest>().FindAllByQuery(query);
             return serviceRequests.ToList();
         }
 
