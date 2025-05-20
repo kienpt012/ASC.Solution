@@ -4,5 +4,21 @@
     ViewData["Title"] = "Confirm email";
 }
 
-<h1>@ViewData["Title"]</h1>
-<partial name="_StatusMessage" model="Model.StatusMessage" />
+<link rel="stylesheet" href="~/css/confirmation.css" />
+
+<div class="confirmation-container">
+    <h1>@ViewData["Title"]</h1>
+    @if (Model.StatusMessage.Contains("Error"))
+    {
+        <div class="alert alert-danger">
+            <p>@Model.StatusMessage</p>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-success">
+            <p>@Model.StatusMessage</p>
+        </div>
+    }
+    <a href="/Identity/Account/Login" class="confirmation-link">Return to Login</a>
+</div>

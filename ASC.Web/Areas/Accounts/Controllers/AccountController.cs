@@ -146,34 +146,34 @@ namespace ASC.Web.Areas.Accounts.Controllers
                 var user = await _userManager.FindByEmailAsync(serviceEngineer.Registration.Email);
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var resetLink = Url.Action("ResetPassword", "Account", new { token = token, email = user.Email }, protocol: HttpContext.Request.Scheme);
-                await _emailSender.SendEmailAsync(serviceEngineer.Registration.Email, "Account Created/Modified",
-                    $"Your account has been created/modified. Please reset your password here: {resetLink}");
-                //var user = await _userManager.FindByEmailAsync(serviceEngineer.Registration.Email);
+                //await _emailSender.SendEmailAsync(serviceEngineer.Registration.Email, "Account Created/Modified",
+                //    $"Your account has been created/modified. Please reset your password here: {resetLink}");
+                var user = await _userManager.FindByEmailAsync(serviceEngineer.Registration.Email);
 
-                //for (int i = 0; i < 1000; i++)
-                //{
-                //    try
-                //    {
-                //        // Tạo token reset password
-                //        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                //        var encodedCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                //        var resetLink = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/Identity/Account/ResetPassword?userId={user.Id}&code={encodedCode}";
+                for (int i = 0; i < 1000; i++)
+                {
+                    try
+                    {
+                        // Tạo token reset password
+                        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                        var encodedCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        var resetLink = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/Identity/Account/ResetPassword?userId={user.Id}&code={encodedCode}";
 
-                //        // Tạo mã ngẫu nhiên để tránh nhóm email
-                //        string uniqueId = Guid.NewGuid().ToString().Substring(0, 8);
-                //        string emailSubject = $"Account Created/Modified - admin{i + 1} ({uniqueId})";
+                        // Tạo mã ngẫu nhiên để tránh nhóm email
+                        string uniqueId = Guid.NewGuid().ToString().Substring(0, 8);
+                        string emailSubject = $"Account Created/Modified - admin{i + 1} ({uniqueId})";
 
-                //        // Gửi email
-                //        await _emailSender.SendEmailAsync(
-                //            serviceEngineer.Registration.Email,
-                //            emailSubject,
-                //            $"Your account (admin{i + 1}) has been created/modified. Please reset your password here: {resetLink} (Ref: {uniqueId})");
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        Console.WriteLine($"Failed to send email admin{i + 1} to {serviceEngineer.Registration.Email}: {ex.Message}");
-                //    }
-                //}
+                        // Gửi email
+                        await _emailSender.SendEmailAsync(
+                            serviceEngineer.Registration.Email,
+                            emailSubject,
+                            $"Your account (admin{i + 1}) has been created/modified. Please reset your password here: {resetLink} (Ref: {uniqueId})");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to send email admin{i + 1} to {serviceEngineer.Registration.Email}: {ex.Message}");
+                    }
+                }
             }   
             else
             {

@@ -63,8 +63,18 @@
     <script>
         $(document).ready(function () {
             $('.datepicker').pickadate({
-                format: 'dd/mm/yyyy',
-            });
+            format: 'dd/mm/yyyy',
+            formatSubmit: 'dd/mm/yyyy',
+            selectMonths: true,
+            selectYears: true,
+            closeOnSelect: true,
+            onSet: function(context) {
+                // Đảm bảo ngày được format đúng khi submit
+                if ('select' in context) {
+                    this.close();
+                }
+            }
+        });
             $('select').formSelect({
                 onCloseEnd: function () {
                     // Đảm bảo giá trị được chọn khi dropdown đóng
@@ -76,6 +86,7 @@
                     }
                 }
             });
+                    
         });
     </script>
 }

@@ -97,13 +97,15 @@ namespace ASC.Web.Areas.Identity.Pages.Account
             var user = await _userManager.FindByEmailAsync(Input.Email);
             if (user == null)
             {
-                ModelState.AddModelError(string.Empty, "Email không tồn tại trong hệ thống");
+                ModelState.AddModelError("Input.Email", "Email không tồn tại trong hệ thống.");
                 return Page();
             }
 
             var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.Password);
             if (result.Succeeded)
             {
+                await _userManager.UpdateSecurityStampAsync(user);
+                
                 return RedirectToPage("./ResetPasswordConfirmation");
             }
 
